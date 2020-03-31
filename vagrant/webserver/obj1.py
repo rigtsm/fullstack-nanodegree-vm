@@ -1,33 +1,29 @@
-# Using the BaseHttpServer library
-# I will be using python3 so i will use someting different
-#from http.server import BaseHTTPRequestHandler, HTTPServer # not working
-
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer # Works perfectly for python 2
-
-# The server is devided in two main sections
-######### handler section #########
-# Here we indicate what code to execute based on the type of HTTP request that is sent to the server
-
-# beeing used in the Post
 import cgi
 
-########## Database CRUD operations ###############
+
+
+########## Initialize Database CRUD operations ###############
+# import CRUD operations 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem
 
+
 engine = create_engine('sqlite:///restaurantMenu.db')
-Base.metadata.bind=engine
+Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 session = DBSession()
 ###################################################
+
+
+
 
 class webServerHandler(BaseHTTPRequestHandler):
 
     # handle the GET request our server receives and shold figure out which resources are requeste to access
     def do_GET(self):
         try:
-            # try for url localhost:8080/hello, then send the 'output' text response
             if self.path.endswith("/hello"):
 
                 self.send_response(200) # successful GET request
@@ -45,22 +41,27 @@ class webServerHandler(BaseHTTPRequestHandler):
                 print(output) # just check the output on the console / debuggin porpuse
                 return # exit
 
-            # try for url localhost:8080/restaurants, then send the 'output' text response
+            # try for url localhost:8080/restaurants
             if self.path.endswith("/restaurants"):
 
                 self.send_response(200) # successful GET request
-                self.send_header('Cntent-type', 'text/html') # inform the client i will reply with a text/html file
-                self.end_headers() # send a blank line to indicate the end of the headers response.
+                self.send_header('Cntent-type', 'text/html') 
+                self.end_headers() 
 
-                # now lest send some content to the client
+                ## Get le list of the Restorant names and  send some content to the client
                 output = ""
                 output += "<html><body>"
                 output += "<h1> Restaurant List!</h1>"
+
+                restaurants = session.query(Restaurant).all()
+                for restaurant in restaurants:
+                    output += restaurant.name
+                    output += "</br></br>"
                 output += "</body></html>"
 
                 self.wfile.write(output) # Send the message back to the client
-                print(output) # just check the output on the console / debuggin porpuse
-                return # exit
+                print(output) 
+                return
 
         except IOError as error:
             print("File not found %s" % self.path)
@@ -101,10 +102,10 @@ def main():
     try:
         port = 8080
         server = HTTPServer(('', port), webServerHandler)
-        print "Web Server running on port %s" % port
+        print("Web Server running on port %s" % port )
         server.serve_forever()
     except KeyboardInterrupt:
-        print " ^C entered, stopping web server...."
+        print(" ^C entered, stopping web server....")
         server.socket.close()
 
 
