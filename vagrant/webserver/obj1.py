@@ -5,13 +5,22 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer # Works perfectly for python 2
 
 # The server is devided in two main sections
-######### handler section ######### 
+######### handler section #########
 # Here we indicate what code to execute based on the type of HTTP request that is sent to the server
 
 # beeing used in the Post
 import cgi
 
+########## Database CRUD operations ###############
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from database_setup import Base, Restaurant, MenuItem
 
+engine = create_engine('sqlite:///restaurantMenu.db')
+Base.metadata.bind=engine
+DBSession = sessionmaker(bind = engine)
+session = DBSession()
+###################################################
 
 class webServerHandler(BaseHTTPRequestHandler):
 
@@ -36,8 +45,8 @@ class webServerHandler(BaseHTTPRequestHandler):
                 print(output) # just check the output on the console / debuggin porpuse
                 return # exit
 
-            # try for url localhost:8080/hello, then send the 'output' text response
-            if self.path.endswith("/hola"):
+            # try for url localhost:8080/restaurants, then send the 'output' text response
+            if self.path.endswith("/restaurants"):
 
                 self.send_response(200) # successful GET request
                 self.send_header('Cntent-type', 'text/html') # inform the client i will reply with a text/html file
@@ -46,8 +55,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                 # now lest send some content to the client
                 output = ""
                 output += "<html><body>"
-                output += "<h1>&#161 Hola !</h1>"
-                output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
+                output += "<h1> Restaurant List!</h1>"
                 output += "</body></html>"
 
                 self.wfile.write(output) # Send the message back to the client
@@ -59,7 +67,7 @@ class webServerHandler(BaseHTTPRequestHandler):
 
 
 
-    def do_Post(self):
+    def do_POST(self):
         try:
             self.send_response(301)
             self.send_header('Content-type', 'text/html')

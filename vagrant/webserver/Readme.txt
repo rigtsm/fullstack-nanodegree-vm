@@ -1,0 +1,1 @@
+1. Create a web page to list all the restaurants in the database localhost:8080/restaurants
