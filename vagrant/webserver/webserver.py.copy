@@ -5,7 +5,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer # Works perfectly for python 2
 
 # The server is devided in two main sections
-######### handler section #########
+######### handler section ######### 
 # Here we indicate what code to execute based on the type of HTTP request that is sent to the server
 
 # beeing used in the Post
@@ -59,7 +59,7 @@ class webServerHandler(BaseHTTPRequestHandler):
 
 
 
-    def do_POST(self):
+    def do_Post(self):
         try:
             self.send_response(301)
             self.send_header('Content-type', 'text/html')
