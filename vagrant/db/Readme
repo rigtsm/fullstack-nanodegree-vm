@@ -1,0 +1,9 @@
+Link: https://classroom.udacity.com/courses/ud088/lessons/3621198668/concepts/36123887280923
+Creating the database with Python using a ORM mapping. The ORM library translates Python object to a SQL statement and
+viceversa.
+The labrary for this evrimoent we will use the SQLAlchemy wich is already installe in the virtual machine.
+Componenets of the script for creating the database:
+    configuration
+    class : is the object oriented rapreseation of a table
+    table
+    mapper
