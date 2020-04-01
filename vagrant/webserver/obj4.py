@@ -51,7 +51,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                     # Objective 4 , Add edit web page
                     output += "<a href = '/restaurants/%s/edit' > Edit </a> " % restaurant.id
                     output += "</br>"
-                    output += "<a href =' #'> Delete </a>"
+                    output += "<a href = '/restaurants/%s/delete'> Delete </a>" %restaurant.id
                     output += "</br></br></br>"
 
                 output += "</body></html>"
@@ -102,6 +102,32 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                     self.wfile.write(output) # Send the message back to the client
                     return
+            
+
+            if self.path.endswith("/delete"):
+
+                # get the id of the restaurant from link "/restaurants/id/edit"
+                restaurantIdPath = self.path.split("/")[2]
+                myRestaurantQuery = session.query(Restaurant).filter_by(id = restaurantIdPath).one()
+
+                if myRestaurantQuery != []:
+
+                    self.send_response(200) 
+                    self.send_header('Cntent-type', 'text/html') 
+                    self.end_headers()
+
+                    # now lest send back some content to the client
+                    output = ""
+                    output += "<html><body>"
+                    output += "<h1>Are you sure you want to delete %s !!!</h1>" % myRestaurantQuery.name
+                    output += "<form method = 'POST' enctype='multipart/form-data' action = '/restaurants/%s/delete'>" % restaurantIdPath
+                    #output += "<input name = 'newRestaurantName' type = 'text' placeholder = %s > " % myRestaurantQuery.name
+                    output += "<input type='submit' value='Delete'>"
+                    output += "</form></body></html>"
+
+                    self.wfile.write(output) # Send the message back to the client
+                    return
+
 
             
         except IOError as error:
@@ -111,6 +137,24 @@ class webServerHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            if self.path.endswith("/delete"):
+
+                ctype, pdict = cgi.parse_header(
+                    self.headers.getheader('content-type'))
+
+                
+                # get the item to update the name
+                restaurantIdPath = self.path.split("/")[2]
+                myRestaurantQuery = session.query(Restaurant).filter_by(id = restaurantIdPath).one()
+
+                if myRestaurantQuery != []:
+                    session.delete(myRestaurantQuery)
+                    session.commit()
+
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
 
             if self.path.endswith("/edit"):
 
