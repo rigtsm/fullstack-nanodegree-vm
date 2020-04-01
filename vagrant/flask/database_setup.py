@@ -43,6 +43,6 @@ class MenuItem(Base):
 
 
 ######### Insert at the end fo the file #############
-engine = create_engine('sqlite:///restaurantMenu.db')
+engine = create_engine('sqlite:///restaurantmenu.db')
 
 Base.metadata.create_all(engine)
