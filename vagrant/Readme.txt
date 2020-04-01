@@ -9,3 +9,5 @@ To turnoff the virtual machine
 
 The directory ./vagrant is connected with the directory /vagrant in the virtual machine. This anables the possibily to share files
 between the machines.
+
+Project solutiuon conde: https://github.com/udacity/Full-Stack-Foundations
