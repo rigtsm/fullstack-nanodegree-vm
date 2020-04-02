@@ -1,6 +1,9 @@
 # FLASK application
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
+
+# library render_template for passing and doing for loops on the varialbles
+# library request : enabling GET POST requests
 
 ########## Initialize Database CRUD operations ###############
 # import for CRUD operations 
@@ -30,31 +33,45 @@ app = Flask(__name__) # instance of the Flask class with the name of the running
 # amazon.com == amazon.com/index
 #@app.route('/') # @ decoratior in python
 #@app.route('/hello') # Decoratiors essentially wraps our function inside the app.route function
+@app.route('/')
 @app.route('/restaurants/<int:restaurant_id>/')
-def restaurantMenu(restaurant_id):
+def restaurantMenu(restaurant_id = 2):
     ''' From the id at the end of the link, get the menu of that corespinding restaurant'''
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
 
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
-       
+    
+    # pass the variables to be visualized directly on the html
     return render_template('menu.html' , restaurant=restaurant, items = items) 
 
 
 
 # Task 1: Create route for newMenuItem function here
-
-@app.route('/restaurants/<int:restaurant_id>/new')
+# Adding Get Post
+@app.route('/restaurants/<int:restaurant_id>/new', methods=['GET','POST'])
 def newMenuItem(restaurant_id):
-    '''Create route for newMenuItem function here'''
+    '''Create route for newMenuItem function here. Handle the GET and POST request to the server'''
+    
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
+    
+    if request.method == 'POST':
+        
+        newItem = MenuItem( 
+            name = request.form['name'], restaurant_id = restaurant_id)
+        session.add(newItem)
+        session.commit()
 
-    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-
-    return "page to create a new menu item for %s . Task 1 complete!" % restaurant.name
-
+        # rederecting the user to previos page
+        return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
+    
+    else: # received a GET request. Reply with the web page with the form for the item 
+        
+        restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
+        #return "Get request from the client. \n Page to create a new menu item for %s ." % restaurant.name
+        return render_template('newmenuitem.html', restaurant_id = restaurant_id , restaurant=restaurant)
 
 
 
