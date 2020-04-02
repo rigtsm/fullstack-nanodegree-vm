@@ -1,11 +1,18 @@
 # Flask web server with CRUD operitions on sqlLite local database.
 
-Project based on Udacity web course **Full Stack Foundations**.
+Project based on Udacity web course [Full Stack Foundations](https://github.com/udacity/Full-Stack-Foundations).
 
 Python dependencies: Flask , sqlalchemy .
 
 Start the server:
-
+    
+    # initialize db
+    python database_setup.py
+    
+    # populate db
+    populating_db.py
+    
+    # start the server
     python webserver.py
 
 Web page served on localhost:5000.
