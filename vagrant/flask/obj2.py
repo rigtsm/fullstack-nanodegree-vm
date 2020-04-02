@@ -1,6 +1,6 @@
 # FLASK application
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for
 
 # library render_template for passing and doing for loops on the varialbles
 # library request : enabling GET POST requests
@@ -46,7 +46,7 @@ def restaurantMenu(restaurant_id = 2):
 
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
-
+    print(">>>>>>>>>>>>>",type(items))
     # pass the variables to be visualized directly on the html
     return render_template('menu.html' , restaurant=restaurant, items = items) 
 
@@ -68,9 +68,6 @@ def newMenuItem(restaurant_id):
             ,restaurant_id = restaurant_id)
         session.add(newItem)
         session.commit()
- 
-        # create a flash msg for the user
-        flash("New menu item succesfuly create!!!")
 
         # rederecting the user to previos page
         return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
@@ -95,12 +92,9 @@ def editMenuItem(restaurant_id, menu_id):
     if request.method == 'POST':
         if request.form['name'] : # if i insert a different name
             item.name = request.form['name']
-
+            
         session.add(item)
         session.commit()
-
-        # create a flash msg for the user
-        flash("Menu item succesfully updated!!!")
 
         return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
     
@@ -126,9 +120,6 @@ def deleteMenuItem(restaurant_id, menu_id):
         session.delete(item)
         session.commit()
 
-        # create a flash msg for the user
-        flash("Menu item succesfully deleted!!!")
-
         return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id)) 
 
     return render_template('deletemenuitem.html'
@@ -143,10 +134,17 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 
+
+
+
+
+
+
+
+
+
 # make sure the server runs if the script is executed directly from the python interpreter and not used as an 
 # imported module
 if __name__ == '__main__':
-    # flash msg
-    app.secret_key = "super_secret_key" # flas will create sessions for the user
     app.debug = True  ### reload everytime some code is changed, non need for restarting
     app.run(host = '0.0.0.0' , port = 5000 )
