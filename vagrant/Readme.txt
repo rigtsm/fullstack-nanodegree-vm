@@ -11,3 +11,6 @@ The directory ./vagrant is connected with the directory /vagrant in the virtual 
 between the machines.
 
 Project solutiuon conde: https://github.com/udacity/Full-Stack-Foundations
+
+Part 1 : created python webserver 
+Part 2 : created flask webserver
