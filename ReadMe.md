@@ -20,4 +20,5 @@ Serving json Api on:
     localhost:/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON'
 
 
-Database schema
+Database schema created with database_setup.py
+![db schema](https://github.com/rigtsm/fullstack-nanodegree-vm/blob/master/restaurantdb.png)
