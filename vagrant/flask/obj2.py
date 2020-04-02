@@ -1,6 +1,6 @@
 # FLASK application
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for , flash, jsonify
 
 # library render_template for passing and doing for loops on the varialbles
 # library request : enabling GET POST requests
@@ -23,7 +23,7 @@ Base.metadata.bind = engine
 # 
 # The application run by the Python intrepreter gets a name variable set to __name__ = main, whereas all the other
 # imported Python files get a __name__ = set to the actial name of the Python file "project"
-print("print the name of ", __name__) # __name__ = main
+#print("print the name of ", __name__) # __name__ = main
 
 app = Flask(__name__) # instance of the Flask class with the name of the running applications 
 
@@ -46,7 +46,6 @@ def restaurantMenu(restaurant_id = 2):
 
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
-    print(">>>>>>>>>>>>>",type(items))
     # pass the variables to be visualized directly on the html
     return render_template('menu.html' , restaurant=restaurant, items = items) 
 
@@ -130,10 +129,41 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 
+# Making an API Endpoint (GET Request) RESTAURANTS
+@app.route('/restaurants/JSON')
+def restauransJSON():
+
+    DBSession = sessionmaker(bind = engine)
+    session = DBSession()
+
+    restaurant = session.query(Restaurant).all()
+    
+    return jsonify(MenuItems = [ i.serialize for i in restaurant ] )
 
 
+# Making an API Endpoint (GET Request) MENUITEMS os a RESTAURANT
+@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
+def restaurantMenyJSON(restaurant_id):
+
+    DBSession = sessionmaker(bind = engine)
+    session = DBSession()
+
+    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
+    items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id).all()
+    
+    return jsonify(MenuItems = [ i.serialize for i in items ] )
 
 
+# Making an API Endpoint (GET Request) the MENUITEM 
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
+def menuItemJson(restaurant_id, menu_id):
+
+    DBSession = sessionmaker(bind = engine)
+    session = DBSession()
+
+    item = session.query(MenuItem).filter_by(id = menu_id).one()    
+
+    return jsonify(MenuItems = item.serialize )
 
 
 
