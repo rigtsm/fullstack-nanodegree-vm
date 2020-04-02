@@ -34,6 +34,10 @@ app = Flask(__name__) # instance of the Flask class with the name of the running
 #@app.route('/') # @ decoratior in python
 #@app.route('/hello') # Decoratiors essentially wraps our function inside the app.route function
 @app.route('/')
+def homeRoute():
+    return redirect(url_for('restaurantMenu', restaurant_id = 1))
+
+
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id = 2):
     ''' From the id at the end of the link, get the menu of that corespinding restaurant'''
@@ -42,7 +46,7 @@ def restaurantMenu(restaurant_id = 2):
 
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
-    
+    print(">>>>>>>>>>>>>",type(items))
     # pass the variables to be visualized directly on the html
     return render_template('menu.html' , restaurant=restaurant, items = items) 
 
@@ -60,7 +64,8 @@ def newMenuItem(restaurant_id):
     if request.method == 'POST':
         
         newItem = MenuItem( 
-            name = request.form['name'], restaurant_id = restaurant_id)
+            name = request.form['name']
+            ,restaurant_id = restaurant_id)
         session.add(newItem)
         session.commit()
 
@@ -75,29 +80,33 @@ def newMenuItem(restaurant_id):
 
 
 
-# Task 2: Create route for editMenuItem function here
-
-@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit')
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit', methods=['GET','POST'])
 def editMenuItem(restaurant_id, menu_id):
     
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
-
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     item = session.query(MenuItem).filter_by(id = menu_id).one()
-
-    output = ''
-    output += 'From restaurant %s' % restaurant.name
-    output += 'edit the menu item %s ' % item.name
     
-    return output
+    # Request after the user entered a new Name for the menu item 
+    if request.method == 'POST':
+        if request.form['name'] : # if i insert a different name
+            item.name = request.form['name']
+            
+        session.add(item)
+        session.commit()
 
+        return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
+    
+    return render_template('editmenuitem.html'
+        , restaurant_id = restaurant_id 
+        , menu_id = menu_id
+        , restaurant=restaurant
+        , item = item)
 
+    
 
-
-# Task 3: Create a route for deleteMenuItem function here
-
-@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/delete')
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/delete', methods=['GET','POST'])
 def deleteMenuItem(restaurant_id, menu_id):
     
     DBSession = sessionmaker(bind = engine)
@@ -106,10 +115,18 @@ def deleteMenuItem(restaurant_id, menu_id):
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     item = session.query(MenuItem).filter_by(id = menu_id).one()
 
-    output = ''
-    output += 'From restaurant %s' % restaurant.name
-    output += ' delete the menu item %s ' % item.name
-    return output
+    if request.method == 'POST':
+
+        session.delete(item)
+        session.commit()
+
+        return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id)) 
+
+    return render_template('deletemenuitem.html'
+            , restaurant_id = restaurant_id 
+            , menu_id = menu_id
+            , restaurant=restaurant
+            , item = item)
 
 
 
